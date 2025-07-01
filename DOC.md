@@ -96,7 +96,8 @@
  - checked 
    - 기존에는 checked 속성이 있기만해도 checked 처리가 되지만
    - 타임리프에서 th:checkd="" 사용하면 true, false 에 따라서 체크 여부를 구분할 수 있다.
-
+ - th:attr="disabled=${...} ? 'A' : 'B' >> disabled를 동적으로 처리하겠다는 의미고 ${...} 이 참이면 'A'를 거짓이면 'B' 값을 주겠다는의미 (삼항연산 가능)
+ - th:attr="속성=값" >>> 단일 값 처리
 
 ## 반복문
  - th:each 를 사용한다
@@ -140,6 +141,32 @@
     - var user1 = {"username":"UserA","age":10}
     - var user2 = {"username":"UserB","age":20}
     - var user3 = {"username":"UserC","age":30}
+
+
+## 템플릿 조각
+ - 웹페이지를 개발 할때 공통 영역이 많다. 타임리프는 이를 위해 템플릿 조각과 레이아웃 기능을 지원한다.
+ - ~{...} 를 사용하는것이 원칙 부분
+ - ~{template/fragment/footer :: copy} 
+   - template/fragment/footer 해당 경로의 파일에서
+   - th:fragment="copy" 부분을 찾아서 사용한다
+   - 변수도 사용 할 수 있다. th:fragment="copyParam (param1, param2)"
+ 
+ - <footer th:fragment="copy">
+ - <footer th:fragment="copyParam (param1, param2)">
     
+ - <div th:insert="~{template/fragment/footer :: copy}"></div>
+   - insert 의 경우는  insert 속성이 있는 <div> 태그 안쪽으로 해당 조각이 들어가는 모양새이고
+ - <div th:replace="~{template/fragment/footer :: copy}"></div>
+   - replace는 <div> 태그가 사라지고 해당 조각으로 대체 되는 모양새이다.
+ - <div th:replace="~{template/fragment/footer :: copyParam ('데이터1', '데이터2')}"></div> 
 
-
+## 템플릿 레이아웃
+ - use
+   -  template/layout/base 경로의 파일의 common_header 값을 가진 fragment를 찾아서 replace 하는데
+   - title, links 값은 기존의 원본 태그의 하위의 title 태그 자체를 사용한다(::title, ::link), 
+   - <head th:replace="template/layout/base :: common_header(~{::title},~{::link})"><title></title><link></link></head>
+ - base
+   - use 에서 보낸 ::title >> 태그 그자체를 replace 해준다   
+   - <head th:fragment="common_header(title,links)">
+   - <title th:replace="${title}">레이아웃 타이틀</title> // n 개의 경우 th:block을 통해 넣어준다.
+   - <th:block th:replace="${links}" />
